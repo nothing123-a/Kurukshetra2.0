@@ -1,0 +1,11 @@
+{
+  "backup_timestamp": "2025-10-09T15:20:14.153359",
+  "files_backed_up": [
+    "config/config.py",
+    "config/app.py",
+    "config/windows_automation.py",
+    "uploads/"
+  ],
+  "backup_size_mb": 0.18535423278808594,
+  "backup_path": "backups\\backup_20251009_152014"
+}
