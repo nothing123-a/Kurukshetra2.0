@@ -70,7 +70,31 @@ export default function Navbar({ onToggleSidebar }) {
   return (
     <nav className="navbar">
       {/* Left Section - Brand and Navigation */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+        {/* Sidebar Toggle Button */}
+        {onToggleSidebar && (
+          <button
+            onClick={onToggleSidebar}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '36px',
+              height: '36px',
+              borderRadius: '8px',
+              border: '1px solid #E8DCC8',
+              background: '#FAF7F0',
+              color: '#5D504F',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            title="Toggle Sidebar"
+            aria-label="Toggle Sidebar"
+          >
+            <FiMenu size={18} />
+          </button>
+        )}
+
         {/* Brand */}
         <Link to="/" className="navbar-brand">
           <div style={{

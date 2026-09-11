@@ -17,7 +17,7 @@ export default function Layout({ children }) {
       <Navbar onToggleSidebar={toggleSidebar} />
       <div className="layout-container">
         {!hideSidebar && <Sidebar collapsed={sidebarCollapsed} onClose={() => setSidebarCollapsed(true)} />}
-        <main className="main-content">
+        <main className={`main-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
           <div className="page-content">
             {children}
           </div>

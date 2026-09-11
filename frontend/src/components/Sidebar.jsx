@@ -78,7 +78,11 @@ export default function Sidebar({ collapsed, onClose }) {
                     key={item.path}
                     to={item.path}
                     className={`sidebar-link ${active ? 'active' : ''}`}
-                    onClick={() => onClose && onClose()}
+                    onClick={() => {
+                      if (isMobile && onClose) {
+                        onClose()
+                      }
+                    }}
                   >
                     <Icon className="sidebar-icon" />
                     <span>{item.label}</span>
