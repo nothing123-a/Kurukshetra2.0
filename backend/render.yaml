@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: bhishma's-backend
+    runtime: python
+    buildCommand: ./build.sh
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 1 --timeout 0 --preload
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FLASK_DEBUG
+        value: False
+      - key: DATABASE_URL
+        value: sqlite:///app.db
+      - key: UPLOAD_FOLDER
+        value: uploads
+      - key: PORT
+        value: 10000
+      - key: HOST
+        value: 0.0.0.0
