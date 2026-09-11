@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: refinify-backend
+    env: python
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 2 --timeout 120 app:app
+    autoDeploy: true
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SERPER_API_KEY
+        sync: false
+      - key: UPLOAD_FOLDER
+        value: uploads
+      - key: SQLALCHEMY_DATABASE_URI
+        value: sqlite:///app.db
+      - key: MAX_CONTENT_LENGTH
+        value: "16777216"
+      - key: CORS_ORIGINS
+        value: "https://refinify.vercel.app,https://refinify-frontend.vercel.app,http://localhost:3000"
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_DEBUG
+        value: "False"
+    healthCheckPath: /health
