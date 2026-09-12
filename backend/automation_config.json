@@ -1,0 +1,13 @@
+{
+  "backup_interval_hours": 24,
+  "data_processing_interval_hours": 6,
+  "quality_check_interval_hours": 12,
+  "max_backup_size_gb": 10,
+  "enable_email_alerts": false,
+  "enable_slack_alerts": false,
+  "admin_email": "admin@refinify-ai.com",
+  "last_backup": "2025-10-09T15:20:14.154364",
+  "last_processing": "2025-10-09T15:20:14.158363",
+  "total_cycles": 8,
+  "successful_cycles": 7
+}

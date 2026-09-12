@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioBERT Risk Analysis Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .container {
+            border: 2px solid #3B82F6;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        h1 { color: #3B82F6; }
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            background: #3B82F6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background: #2563EB; }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f9ff;
+            border-radius: 5px;
+        }
+        .success { color: #10B981; }
+        .error { color: #EF4444; }
+        .metric {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .metric-label { font-size: 12px; color: #666; }
+        .metric-value { font-size: 24px; font-weight: bold; color: #3B82F6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧬 BioBERT Risk Analysis Test</h1>
+        <p>Upload a CSV file to test the BioBERT risk analysis endpoint</p>
+        
+        <div class="upload-area">
+            <input type="file" id="fileInput" accept=".csv" />
+            <br><br>
+            <button id="uploadBtn" onclick="uploadFile()">Analyze with BioBERT</button>
+        </div>
+        
+        <div id="status"></div>
+        <div id="results" class="results" style="display:none;"></div>
+    </div>
+
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            const uploadBtn = document.getElementById('uploadBtn');
+            
+            if (!fileInput.files[0]) {
+                alert('Please select a CSV file');
+                return;
+            }
+            
+            uploadBtn.disabled = true;
+            statusDiv.innerHTML = '<p>⏳ Analyzing with BioBERT...</p>';
+            resultsDiv.style.display = 'none';
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/risk-analysis/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const analysis = JSON.parse(data.biobert_analysis);
+                    
+                    statusDiv.innerHTML = '<p class="success">✅ Analysis Complete!</p>';
+                    
+                    resultsDiv.innerHTML = `
+                        <h3>BioBERT Analysis Results</h3>
+                        
+                        <div class="metric">
+                            <div class="metric-label">Risk Level</div>
+                            <div class="metric-value" style="color: ${
+                                analysis.risk_level === 'LOW' ? '#10B981' :
+                                analysis.risk_level === 'MEDIUM' ? '#F59E0B' : '#EF4444'
+                            }">${analysis.risk_level}</div>
+                        </div>
+                        
+                        <div class="metric">
+                            <div class="metric-label">Success Probability</div>
+                            <div class="metric-value">${analysis.success_probability}%</div>
+                        </div>
+                        
+                        <div class="metric">
+                            <div class="metric-label">Data Completeness</div>
+                            <div class="metric-value">${analysis.bio_metrics.completeness}%</div>
+                        </div>
+                        
+                        <h4>📊 Graphs Generated:</h4>
+                        <ul>
+                            ${Object.keys(analysis.graphs || {}).map(key => 
+                                `<li><strong>${key}</strong>: ${analysis.graphs[key].type} chart (${analysis.graphs[key].data?.length || 0} points)</li>`
+                            ).join('')}
+                        </ul>
+                        
+                        <h4>⚠️ Risk Factors:</h4>
+                        <ul>
+                            ${analysis.risk_factors.map(f => `<li>${f}</li>`).join('')}
+                        </ul>
+                        
+                        <h4>💡 Recommendations:</h4>
+                        <ul>
+                            ${analysis.recommendations.map(r => `<li>${r}</li>`).join('')}
+                        </ul>
+                        
+                        <h4>🔬 BioBERT Analysis:</h4>
+                        <p>${analysis.biobert_analysis}</p>
+                    `;
+                    
+                    resultsDiv.style.display = 'block';
+                } else {
+                    statusDiv.innerHTML = `<p class="error">❌ Error: ${data.error}</p>`;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<p class="error">❌ Connection Error: ${error.message}</p>`;
+                console.error('Error:', error);
+            } finally {
+                uploadBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

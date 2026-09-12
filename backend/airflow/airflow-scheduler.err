@@ -1,0 +1,14 @@
+[[34m2025-10-09T10:17:42.181370Z[0m] {[34mexecutor_loader.py:[0m281} INFO[0m - Loaded executor: :LocalExecutor:[0m
+/Users/anuj/SECOND YEAR PROGRAMMING/PROJECT/Project-Drona-2.0/backend/venv/lib/python3.12/site-packages/airflow/providers/fab/www/constants.py:27 DeprecationWarning: The enable_swagger_ui option in [webserver] has been moved to the enable_swagger_ui option in [api] - the old setting has been used, but please update your config.
+/Users/anuj/SECOND YEAR PROGRAMMING/PROJECT/Project-Drona-2.0/backend/venv/lib/python3.12/site-packages/airflow/providers/fab/auth_manager/fab_auth_manager.py:108 RemovedInAirflow4Warning: The airflow.security.permissions module is deprecated; please see https://airflow.apache.org/docs/apache-airflow/stable/security/deprecated_permissions.html
+[[34m2025-10-09T10:17:42.983633Z[0m] {[34mcore.py:[0m50} INFO[0m - Starting log server on http://[::]:8793[0m
+WARNING:  ASGI app factory detected. Using it, but please consider setting the --factory flag explicitly.
+INFO:     Started server process [61673]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://:8793 (Press CTRL+C to quit)
+[[34m2025-10-09T10:47:42.215043Z[0m] {[34mbase.py:[0m222} INFO[0m - checking for stale bundle versions locally[0m
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [61673]

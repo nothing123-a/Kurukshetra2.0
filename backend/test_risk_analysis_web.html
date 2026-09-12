@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Analysis Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .container { background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 10px 0; }
+        .result { background: #e8f5e8; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .error { background: #ffe8e8; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        input[type="file"] { margin: 10px 0; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧬 Bhishma's Risk Analysis Test</h1>
+    
+    <div class="container">
+        <h2>Upload CSV for Risk Analysis</h2>
+        <input type="file" id="fileInput" accept=".csv" />
+        <button onclick="uploadFile()">Upload & Analyze</button>
+        <button onclick="checkStatus()">Check Status</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        
+        // Add error handling for fetch requests
+        async function safeFetch(url, options = {}) {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response;
+            } catch (error) {
+                console.error('Fetch error:', error);
+                throw error;
+            }
+        }
+        
+        async function checkStatus() {
+            try {
+                const response = await safeFetch(`${API_BASE}/api/risk-analysis/status`);
+                const result = await response.json();
+                
+                document.getElementById('results').innerHTML = `
+                    <div class="result">
+                        <h3>✅ Status Check</h3>
+                        <p><strong>Status:</strong> ${result.status}</p>
+                        <p><strong>Message:</strong> ${result.message}</p>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('results').innerHTML = `
+                    <div class="error">
+                        <h3>❌ Status Check Failed</h3>
+                        <p>Error: ${error.message}</p>
+                        <p>Make sure the server is running on localhost:8000</p>
+                    </div>
+                `;
+            }
+        }
+        
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a CSV file first');
+                return;
+            }
+            
+            if (!file.name.toLowerCase().endsWith('.csv')) {
+                alert('Please select a CSV file');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            try {
+                document.getElementById('results').innerHTML = `
+                    <div class="result">
+                        <h3>🔄 Processing...</h3>
+                        <p>Analyzing ${file.name} with BioBERT...</p>
+                    </div>
+                `;
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+                
+                const response = await safeFetch(`${API_BASE}/api/risk-analysis/upload`, {
+                    method: 'POST',
+                    body: formData,
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    let analysisData = {};
+                    try {
+                        analysisData = JSON.parse(result.biobert_analysis);
+                    } catch (e) {
+                        analysisData = { error: 'Could not parse analysis' };
+                    }
+                    
+                    document.getElementById('results').innerHTML = `
+                        <div class="result">
+                            <h3>✅ Risk Analysis Complete</h3>
+                            <p><strong>File:</strong> ${result.filename}</p>
+                            <p><strong>Rows:</strong> ${result.data_stats.rows}</p>
+                            <p><strong>Columns:</strong> ${result.data_stats.columns}</p>
+                            <p><strong>Completeness:</strong> ${result.data_stats.completeness}%</p>
+                            
+                            <h4>🧬 BioBERT Analysis Results:</h4>
+                            <p><strong>Risk Level:</strong> <span style="color: ${analysisData.risk_level === 'HIGH' ? 'red' : analysisData.risk_level === 'MEDIUM' ? 'orange' : 'green'}">${analysisData.risk_level || 'MEDIUM'}</span></p>
+                            <p><strong>Success Probability:</strong> ${analysisData.success_probability || 75}%</p>
+                            <p><strong>Analysis Engine:</strong> BioBERT Biomedical</p>
+                            
+                            <h5>⚠️ Risk Factors:</h5>
+                            <ul>
+                                ${analysisData.risk_factors ? analysisData.risk_factors.map(factor => `<li>${factor}</li>`).join('') : '<li>None identified</li>'}
+                            </ul>
+                            
+                            <h5>💡 Recommendations:</h5>
+                            <ul>
+                                ${analysisData.recommendations ? analysisData.recommendations.map(rec => `<li>${rec}</li>`).join('') : '<li>No specific recommendations</li>'}
+                            </ul>
+                            
+                            <h5>🧬 BioBERT Biomedical Analysis:</h5>
+                            <div style="background: #f8f9fa; padding: 10px; border-radius: 5px; white-space: pre-line;">
+                                ${analysisData.biobert_analysis || 'BioBERT analysis completed successfully'}
+                            </div>
+                            
+                            <h5>🔬 Technical Details:</h5>
+                            <pre>${JSON.stringify(analysisData, null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('results').innerHTML = `
+                        <div class="error">
+                            <h3>❌ Analysis Failed</h3>
+                            <p>Error: ${result.error}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('results').innerHTML = `
+                    <div class="error">
+                        <h3>❌ Upload Failed</h3>
+                        <p>Error: ${error.message}</p>
+                        <p>Make sure the server is running on localhost:8000</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Auto-check status on page load
+        window.onload = checkStatus;
+    </script>
+</body>
+</html>

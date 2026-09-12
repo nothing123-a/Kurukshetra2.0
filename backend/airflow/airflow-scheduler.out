@@ -1,0 +1,7 @@
+[[34m2025-10-09T10:17:42.179891Z[0m] {[34mscheduler_job_runner.py:[0m1018} INFO[0m - Starting the scheduler[0m
+[[34m2025-10-09T10:17:42.180912Z[0m] {[34mtokens.py:[0m529} [33mWARNING[0m - [33m`api_auth/jwt_secret` was empty, using a generated one for now. Please set this in your config[0m
+[[34m2025-10-09T10:17:42.188246Z[0m] {[34mscheduler_job_runner.py:[0m2240} INFO[0m - Adopting or resetting orphaned tasks for active dag runs[0m
+[[34m2025-10-09T10:22:42.206730Z[0m] {[34mscheduler_job_runner.py:[0m2240} INFO[0m - Adopting or resetting orphaned tasks for active dag runs[0m
+[[34m2025-10-09T10:27:42.224945Z[0m] {[34mscheduler_job_runner.py:[0m2240} INFO[0m - Adopting or resetting orphaned tasks for active dag runs[0m
+[[34m2025-10-09T10:32:42.249606Z[0m] {[34mscheduler_job_runner.py:[0m2240} INFO[0m - Adopting or resetting orphaned tasks for active dag runs[0m
+[[34m2025-10-09T10:37:42.286617Z[0m] {[34mscheduler_job_runner.py:[0m2240} INFO[0m - Adopting or resetting orphaned tasks for active dag runs[0m
