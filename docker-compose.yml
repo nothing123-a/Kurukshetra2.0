@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: ${DOCKERHUB_USERNAME:-drona}/drona-backend:latest
+    container_name: drona_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      # Persistent storage for SQLite database and uploaded files
+      - backend_data:/app/instance
+      - backend_uploads:/app/uploads
+    networks:
+      - drona_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # If left blank, Nginx proxies requests to backend:8000
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-}
+    image: ${DOCKERHUB_USERNAME:-drona}/drona-frontend:latest
+    container_name: drona_frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - drona_network
+
+volumes:
+  backend_data:
+  backend_uploads:
+
+networks:
+  drona_network:
+    driver: bridge
